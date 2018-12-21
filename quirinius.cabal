@@ -1,0 +1,23 @@
+name:                quirinius
+version:             0.1
+synopsis:            A simple type-safe query EDSL
+-- description:
+license:             BSD3
+license-file:        LICENSE
+author:              Emil Axelsson
+maintainer:          78emil@gmail.com
+copyright:           2018 Emil Axelsson
+category:            Database
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     Quirinius
+  -- other-modules:
+  -- other-extensions:
+  build-depends:       base >=4.11 && <4.12
+                     , ghc-prim >=0.5 && < 0.6
+                     , text <1.3
+  hs-source-dirs:      src
+  default-language:    Haskell2010
