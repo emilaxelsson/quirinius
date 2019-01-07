@@ -1,4 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 -- Quirinius is a simple query EDSL inspired by Rails active record queries.
 --
@@ -21,6 +22,7 @@ import Prelude hiding (GT, LT)
 import Data.Proxy (Proxy (..))
 import Data.Text (Text)
 import qualified Data.Text as Text
+import GHC.OverloadedLabels (IsLabel (..))
 import GHC.Records (HasField (..))
 import GHC.TypeLits (KnownSymbol, symbolVal)
 
@@ -144,9 +146,25 @@ sum_ = Sum
 fld :: forall f tab a. (HasField f tab a, KnownSymbol f) => QExp tab a
 fld = Fld (Proxy @f)
 
--- | Get the value of a field (i.e. column)
+-- | Get the value of a partial field (i.e. column)
 mfld :: forall f tab a. (HasField f tab (Maybe a), KnownSymbol f) => QExp tab a
 mfld = MFld (Proxy @f)
+
+class ColumnType a b | a -> b where
+  -- | Get the value of a field (i.e. column)
+  --
+  -- This function generalized 'fld' and 'mfld'.
+  getFld :: (HasField f tab a, KnownSymbol f) => proxy f -> QExp tab b
+
+instance {-# OVERLAPPABLE #-} (a ~ b) => ColumnType a b where
+  getFld = Fld
+
+instance {-# OVERLAPPING #-} ColumnType (Maybe a) a where
+  getFld = MFld
+
+instance (HasField f tab a, KnownSymbol f, ColumnType a b) =>
+         IsLabel f (QExp tab b) where
+  fromLabel = getFld (Proxy @f)
 
 (.=) :: Eq a => QExp tab a -> QExp tab a -> QExp tab Bool
 (.=) = Eq

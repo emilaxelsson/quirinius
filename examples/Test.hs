@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedLabels #-}
+
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 
 -- This file demonstrates using Quirinius with a MySQL backend.
@@ -44,24 +46,24 @@ instance QueryResult Car
 q1 :: Query Person (Record '["name" :-> Text])
 q1 =
   table @Person &
-  where_ (fld @"age" .> 50) &
-  where_ (fld @"height" .> 1.75) &
+  where_ (#age .> 50) &
+  where_ (#height .> 1.75) &
   select @'["name"]
 
 -- Return a text value rather than a singleton record
 q2 :: Query Person Text
 q2 =
   table @Person &
-  where_ (fld @"age" .> 50) &
-  where_ (fld @"height" .> 1.75) &
-  project (fld @"name")
+  where_ (#age .> 50) &
+  where_ (#height .> 1.75) &
+  project #name
 
 -- Summation
 q3 :: Query Person Double
 q3 =
   table @Person &
-  where_ (fld @"age" .> 20) &
-  sum_ (fld @"height" * 2)
+  where_ (#age .> 20) &
+  sum_ (#height * 2)
 
 -- Full table (the result is a `Person`)
 q4 :: RowQuery Person Person
@@ -77,13 +79,13 @@ q5 =
 fastDrivers :: Query Person Text
 fastDrivers =
   table @Person &
-  where_ (fld @"drives" .= inner fastCars) &
-  project (fld @"name")
+  where_ (#drives .= inner fastCars) &
+  project #name
   where
     fastCars =
       table @Car &
-      where_ (fld @"speed" .> 120) &
-      project (fld @"brand")
+      where_ (#speed .> 120) &
+      project #brand
 
 
 
