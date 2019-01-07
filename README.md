@@ -4,10 +4,22 @@ Quirinius is a simple type-safe EDSL for database queries.
 
 Notable features:
 
-  * Works with normal Haskell records
-  * Type-safety obtained through typed record labels
+  * Queries expressed compositionally using `(&)` (inspired by Rails active record queries)
+  * Works with "normal" Haskell records (see below)
+  * Type-safety obtained through GHC's `HasField` class
   * Supports inner queries
   * Integrates with [persistent](https://hackage.haskell.org/package/persistent) (providing multiple backends)
+
+"Normal records" means that a type such as
+
+```haskell
+data Person = Person
+  { name :: Text
+  , age  :: Int
+  }
+```
+
+can be used as is, provided that it corresponds to a table in the database. Note, however, that referring to fields inside queries requires `OverloadedLabels`. That is, you have to use `#name` to refer to the `name` column in a query.
 
 See the [examples/Test.hs](examples/Test.hs) to get a feeling for how Quirinius works.
 
@@ -23,6 +35,7 @@ An interesting aspect of the implementation is the minimal use of generics and a
 ## Shortcomings
 
   * Only a restricted form of select queries are supported, no write operations.
+  * Joins are not (yet) supported.
   * Quirinius has no knowledge of schemas.
   * Queries cannot have shared temporary variables.
       - (Could be solved by CSE.)
